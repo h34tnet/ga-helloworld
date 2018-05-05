@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 public class GeneticMain {
 
-    private static final int POPSIZE = 512;
-    private static final boolean ELITISM = false;
+    private static final int POPSIZE = 256;
+    private static final boolean ELITISM = true;
 
     public static void main(String[] args) {
         final String target = "Hello, World!";

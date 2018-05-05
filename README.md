@@ -9,5 +9,8 @@ The easiest way to print "Hello, World!"? Genetic programming, of course!
 
 Done.
 
-Supplied are, respectively, HillClimberMain and GeneticMain. Note that both supply suboptimal solutions at best and might fail 
-at coming up with ANY solution at all (especially the GeneticMain).
+Supplied are, respectively, HillClimberMain and GeneticMain. Note that both supply suboptimal 
+solutions at best and might fail at coming up with ANY solution at all (especially the GeneticMain).
+
+Generally, the HillClimber quickly finds a bad solution (local minimum) while the Genetic Algorithm 
+finds a better one but takes a lot longer.  
