@@ -3,6 +3,11 @@ package net.h34t.hw;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+/**
+ * This is a very simplistic BrainFuck interpreter.
+ *
+ * The READ operator "," is not implemented.
+ */
 public class VM {
 
     public static final char[] INSTRUCTIONS = "<>+-.[]".toCharArray();
@@ -13,18 +18,32 @@ public class VM {
 
     private int ip;
 
+    /**
+     * Creates a new VM with 64 bytes of memory
+     */
     public VM() {
         mem = new byte[64];
         dp = 0;
         ip = 0;
     }
 
+    /**
+     * Creates a new VM with ramsize bytes of memory
+     */
     public VM(int ramsize) {
         mem = new byte[ramsize];
         dp = 0;
         ip = 0;
     }
 
+    /**
+     * Executes a given program
+     *
+     * @param program the program to execute
+     * @param instLimit the number of cycles after which the program forcefully exits
+     * @return the output of the program
+     * @throws GuruMeditationException
+     */
     public String execute(String program, long instLimit) throws GuruMeditationException {
         StringBuilder output = new StringBuilder();
 
@@ -61,6 +80,8 @@ public class VM {
                 ip++;
                 return;
             case '.':
+                // print the character at the current memory position
+                //
                 printer.accept(new String(new byte[]{mem[dp]}, StandardCharsets.ISO_8859_1).charAt(0));
                 ip++;
                 return;
@@ -85,11 +106,9 @@ public class VM {
                     ip++;
 
                 return;
-//            case '$':
-//                ip = -1;
-//                return;
             default:
-                throw new RuntimeException("Illegal instruction " + inst);
+                // ignore "illegal" characters which can be used as comments
+                ip++;
         }
     }
 
