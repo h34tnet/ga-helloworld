@@ -1,6 +1,6 @@
 package net.h34t.hw;
 
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 import java.util.stream.Stream;
 
 public class HillClimberMain {
@@ -8,6 +8,7 @@ public class HillClimberMain {
     public static void main(String[] args) {
         // what we want the program to print
         final String target = "Hello, World!";
+        Random r = new Random();
 
         // "" is a valid program, so we know this works even though the score method might return null
         ScoredProgram candidate = Evaluator.score("", target);
@@ -24,7 +25,7 @@ public class HillClimberMain {
             final double parentScore = candidate.score;
 
             // generate children until one is fitter than the parent
-            candidate = Stream.generate(() -> Mutator.mutate(ThreadLocalRandom.current(), parentProgram, 0.025d, VM.INSTRUCTIONS))
+            candidate = Stream.generate(() -> Mutator.mutate(r, parentProgram, 0.025d, VM.INSTRUCTIONS))
                     .map(c -> Evaluator.score(c, target))
                     .filter(c -> c != null && c.score < parentScore)
                     .findAny()
@@ -36,5 +37,10 @@ public class HillClimberMain {
 
         System.out.println("Solution found in generation " + gen);
         System.out.println(candidate);
+
+        try {
+            System.out.println(new VM().execute(candidate.program, 100_000));
+        } catch (Exception ignored) {
+        }
     }
 }

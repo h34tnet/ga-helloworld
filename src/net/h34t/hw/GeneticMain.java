@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,9 +18,11 @@ public class GeneticMain {
 
         final char[] INSTRUCTIONS = "<>+-.[]".toCharArray();
 
+        Random r = new Random();
+
         // prepare the initial population with random working programs until the pool is full
         final List<ScoredProgram> population = Stream.generate(() ->
-                Evaluator.score(Mutator.generateRandomProgram(ThreadLocalRandom.current(), 32, INSTRUCTIONS), target))
+                Evaluator.score(Mutator.generateRandomProgram(r, 32, INSTRUCTIONS), target))
                 .filter(Objects::nonNull)
                 .limit(POPSIZE)
                 .collect(Collectors.toList());
@@ -36,11 +38,10 @@ public class GeneticMain {
 
         // repeat until we get an individual that outputs the target string
         while (!champion.output.equals(target)) {
-
             // generate children and add them to the next generation until it reaches POPSIZE
             childPopulation.addAll(Stream.generate(() -> {
-                String cdna = Breeder.breed(ThreadLocalRandom.current(), population, (int) Math.sqrt(POPSIZE));
-                cdna = Mutator.mutate(ThreadLocalRandom.current(), cdna, 0.025d, INSTRUCTIONS);
+                String cdna = Breeder.breed(r, population, (int) Math.sqrt(POPSIZE));
+                cdna = Mutator.mutate(r, cdna, 0.025d, INSTRUCTIONS);
                 return Evaluator.score(cdna, target);
             })
                     // remove invalid programs
@@ -54,10 +55,10 @@ public class GeneticMain {
                 childPopulation.add(champion);
 
             // find the best child of the new generation
-            Optional<ScoredProgram> best = childPopulation.parallelStream()
+            Optional<ScoredProgram> best = childPopulation.stream()
                     .min(ScoredProgram.CMP);
 
-            // if a candidate who produces the correct output is found, stop
+            // if a new best candidate is found, remember it for elitism breeding and debug out
             if (best.isPresent() && best.get().score < champion.score) {
                 champion = best.get();
                 System.out.printf("%8d: %s%n", gen, champion);
@@ -73,5 +74,10 @@ public class GeneticMain {
 
         System.out.println("Solution found in generation " + gen);
         System.out.println(champion);
+
+        try {
+            System.out.println(new VM().execute(champion.program, 100_000));
+        } catch (Exception ignored) {
+        }
     }
 }

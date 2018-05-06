@@ -5,7 +5,9 @@ The easiest way to print "Hello, World!"? Genetic programming, of course!
 1. Write a brainfuck ([wikipedia](https://en.wikipedia.org/wiki/Brainfuck) 
   or [esolang](https://esolangs.org/wiki/Brainfuck)) interpreter (see VM.java).
   
-2. Use a hillclimber or a genetic algorithm to create a brainfuck that prints "Hello, World!".
+2. Use a hillclimber or a genetic algorithm to create a brainfuck program that prints "Hello, World!".
+
+3. Use the interpreter from (1) to execute the program from (2). 
 
 Done.
 
