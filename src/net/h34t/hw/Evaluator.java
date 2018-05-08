@@ -9,13 +9,13 @@ public class Evaluator {
      * Runs the program, rates it and returns it.
      *
      * @param program the program to run
-     * @param target the output to score against
+     * @param target  the output to score against
      * @return the program plus its score or null, if the program was invalid
      */
     public static ScoredProgram score(String program, String target) {
         try {
             // execute the program
-            String output = new VM().execute(program, INST_LIMIT);
+            String output = new VM().execute(program, () -> (byte) 0, INST_LIMIT);
 
             // compare the output to the target string and get the similarity score
             double score = similarity(output, target);
@@ -39,12 +39,15 @@ public class Evaluator {
      *
      * @param s1 candidate string
      * @param s2 target string
-     * @return a number indicating the difference between source and target strings
+     * @return a number indicating the difference between so urce and target strings
      */
     public static double similarity(String s1, String s2) {
         double diff = 0;
         for (int i = 0, ii = Math.min(s1.length(), s2.length()); i < ii; i++) {
             int d = s1.charAt(i) - s2.charAt(i);
+            // rewards matches at the front of the string
+            // diff += (d * d * (ii + 1)) / (i + 1);
+
             diff += d * d;
         }
 

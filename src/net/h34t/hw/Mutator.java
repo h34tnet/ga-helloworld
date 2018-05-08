@@ -28,10 +28,16 @@ public class Mutator {
                             prog.add(selectRandom(r, ops));
                             break;
                         case 1:
-                            prog.add(c);
-                            prog.add(selectRandom(r, ops));
+                            if (r.nextBoolean()) {
+                                prog.add(c);
+                                prog.add(selectRandom(r, ops));
+                                
+                            } else {
+                                prog.add(selectRandom(r, ops));
+                                prog.add(c);
+                            }
                             break;
-                        case 2:
+                        case 3:
                             break;
                     }
 

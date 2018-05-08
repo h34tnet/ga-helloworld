@@ -2,15 +2,16 @@ package net.h34t.hw;
 
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * This is a very simplistic BrainFuck interpreter.
- *
+ * <p>
  * The READ operator "," is not implemented.
  */
 public class VM {
 
-    public static final char[] INSTRUCTIONS = "<>+-.[]".toCharArray();
+    public static final char[] INSTRUCTIONS = "<>+-.,[]".toCharArray();
 
     private byte[] mem;
 
@@ -39,17 +40,17 @@ public class VM {
     /**
      * Executes a given program
      *
-     * @param program the program to execute
+     * @param program   the program to execute
      * @param instLimit the number of cycles after which the program forcefully exits
      * @return the output of the program
      * @throws GuruMeditationException
      */
-    public String execute(String program, long instLimit) throws GuruMeditationException {
+    public String execute(String program, Supplier<Byte> input, long instLimit) throws GuruMeditationException {
         StringBuilder output = new StringBuilder();
 
         while (ip < program.length() && ip > -1) {
             char inst = program.charAt(ip);
-            exec(inst, program, output::append);
+            exec(inst, program, output::append, input);
 
             if (instLimit-- < 0)
                 throw new GuruMeditationException("Program takes too long to finish");
@@ -58,7 +59,7 @@ public class VM {
         return output.toString();
     }
 
-    private void exec(char inst, String program, Consumer<Character> printer) throws GuruMeditationException {
+    private void exec(char inst, String program, Consumer<Character> printer, Supplier<Byte> input) throws GuruMeditationException {
         switch (inst) {
             case '<':
                 dp--;
@@ -86,7 +87,7 @@ public class VM {
                 ip++;
                 return;
             case ',':
-                // we do not accept input
+                mem[dp] = input.get();
                 ip++;
                 return;
             case '[':

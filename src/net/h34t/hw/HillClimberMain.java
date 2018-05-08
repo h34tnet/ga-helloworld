@@ -39,7 +39,7 @@ public class HillClimberMain {
         System.out.println(candidate);
 
         try {
-            System.out.println(new VM().execute(candidate.program, 100_000));
+            System.out.println(new VM().execute(candidate.program, () -> (byte) 0, 1_024));
         } catch (Exception ignored) {
         }
     }

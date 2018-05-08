@@ -16,13 +16,13 @@ public class GeneticMain {
     public static void main(String[] args) {
         final String target = "Hello, World!";
 
-        final char[] INSTRUCTIONS = "<>+-.[]".toCharArray();
+        final char[] INSTRUCTIONS = "<>+-.,[]".toCharArray();
 
         Random r = new Random();
 
         // prepare the initial population with random working programs until the pool is full
         final List<ScoredProgram> population = Stream.generate(() ->
-                Evaluator.score(Mutator.generateRandomProgram(r, 32, INSTRUCTIONS), target))
+                Evaluator.score(Mutator.generateRandomProgram(r, 64, INSTRUCTIONS), target))
                 .filter(Objects::nonNull)
                 .limit(POPSIZE)
                 .collect(Collectors.toList());
@@ -36,14 +36,23 @@ public class GeneticMain {
 
         int gen = 0;
 
+        // select a breeder
+        Breeder breeder = new TournamentCrossoverBreederBreeder(r, (int) Math.sqrt(POPSIZE));
+        // Breeder breeder = new TruncationBreeder(r, 0.5d);
+
         // repeat until we get an individual that outputs the target string
         while (!champion.output.equals(target)) {
+
+            breeder.setParentPopulation(population);
+
             // generate children and add them to the next generation until it reaches POPSIZE
-            childPopulation.addAll(Stream.generate(() -> {
-                String cdna = Breeder.breed(r, population, (int) Math.sqrt(POPSIZE));
-                cdna = Mutator.mutate(r, cdna, 0.025d, INSTRUCTIONS);
-                return Evaluator.score(cdna, target);
-            })
+            childPopulation.addAll(Stream.generate(() -> null)
+                    .parallel()
+                    .map(x -> {
+                        String cdna = breeder.breed();
+                        cdna = Mutator.mutate(r, cdna, 0.025d, INSTRUCTIONS);
+                        return Evaluator.score(cdna, target);
+                    })
                     // remove invalid programs
                     .filter(Objects::nonNull)
                     // until we have POPSIZE individuals
@@ -76,7 +85,7 @@ public class GeneticMain {
         System.out.println(champion);
 
         try {
-            System.out.println(new VM().execute(champion.program, 100_000));
+            System.out.println(new VM().execute(champion.program, () -> (byte) 0, 100_000));
         } catch (Exception ignored) {
         }
     }
